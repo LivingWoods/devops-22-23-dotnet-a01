@@ -10,8 +10,6 @@ public class Measurement
 
     public Measurement(double weight, double fatPercentage, double musclePercentage, double waistCircumference, DateTime measuredOn)
     {
-        
-
         Weight = Guard.Against.NegativeOrZero(weight, nameof(weight));
         FatPercentage = Guard.Against.NegativeOrZero(fatPercentage, nameof(fatPercentage));
         MusclePercentage = Guard.Against.NegativeOrZero(musclePercentage, nameof(musclePercentage));

@@ -2,6 +2,7 @@
 
 public class Subscription
 {
+    /* TODO Add ValidityDate */
     public DateTime ValidFrom { get; private set; }
     public DateTime ValidTill { get; private set; }
     public Payment? Payment { get; private set; }

@@ -3,13 +3,14 @@
 public class MultipleUseCard
 {
     private List<Reservation> _uses = new();
+    public int AmountOfUses { get; private set; }
     public ValidityDate? ValidityDate { get; private set; }
     public Payment? Payment { get; private set; }
 
     /// <summary>
     /// Returns the amount of free uses available on the multiple use card
     /// </summary>
-    public int AmountOfFreeUses => 10 - _uses.Count();
+    public int AmountOfAvailableUses => AmountOfUses - _uses.Count;
     /// <summary>
     /// Returns whether the multiple use card has already been paid for
     /// </summary>
@@ -19,13 +20,18 @@ public class MultipleUseCard
     /// </summary>
     public IReadOnlyList<Reservation> Uses => _uses.AsReadOnly();
 
+    public MultipleUseCard(int amountOfUses)
+    {
+        AmountOfUses = amountOfUses;
+    }
+
     /// <summary>
     /// Adds a payment to the multiple use card
     /// </summary>
     /// <exception cref="Exception"></exception>
     public Result AddPayment()
     {
-        if (Payment != null)
+        if (IsPaid)
         {
             Result.Fail("There already exists a payment");
         }
@@ -41,17 +47,12 @@ public class MultipleUseCard
     /// <exception cref="Exception"></exception>
     public Result AddUse(Session session)
     {
-        if (!IsValid())
+        if (IsValid().IsFailure)
         {
-            return Result.Fail("The multiple use card is no longer valid");
+            return IsValid();
         }
 
-        if (Uses.Count() >= 10)
-        {
-            return Result.Fail("The multiple use card is full");
-        }
-
-        if (Uses.Count() == 0)
+        if (_uses.Count == 0)
         {
             ValidityDate = new ValidityDate(session.StartDate, session.EndDate.AddYears(1));
         }
@@ -63,19 +64,24 @@ public class MultipleUseCard
     /*TO BE IMPLEMENTED*/
     public void RemoveUse(Reservation rese)
     {
-        Reservation useToBeRemoved = _uses.Remove(rese.);
+        //Reservation useToBeRemoved = _uses.Remove(rese.);
     }
     /// <summary>
     /// Checks wether the multiple use card is still valid
     /// </summary>
     /// <returns>true or false</returns>
-    private bool IsValid()
+    private Result IsValid()
     {
-        if (ValidityDate == null || ValidityDate.ValidTill > DateTime.UtcNow)
+        if (ValidityDate != null && ValidityDate.ValidTill < DateTime.UtcNow)
         {
-            return true;
+            return Result.Fail("Multiple use card has expired");
         }
 
-        return false;
+        if (_uses.Count >= AmountOfUses)
+        {
+            return Result.Fail("Multiple use card has no uses left");
+        }
+
+        return Result.Ok();
     }
 }
