@@ -1,4 +1,4 @@
-﻿namespace Domain;
+﻿namespace Squads.Domain;
 
 public class Trainee 
 {
